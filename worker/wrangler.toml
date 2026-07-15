@@ -1,0 +1,7 @@
+name = "orbit-swap-quote"
+main = "src/index.ts"
+compatibility_date = "2026-07-15"
+
+# Set this after deploy:
+# wrangler secret put ZEROX_API_KEY
+# wrangler secret put ALLOWED_ORIGIN

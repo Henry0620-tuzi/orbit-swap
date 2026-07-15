@@ -12,6 +12,7 @@ const marketRows = [
 const short = (address?: string) => address ? `${address.slice(0, 6)}…${address.slice(-4)}` : ''
 const native = (token: Token) => token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
 const activity = [['刚刚', '已连接钱包', '只读', '当前设备'], ['—', '暂无链上交易', '等待交易', 'Base']]
+const quoteApi = (import.meta.env.VITE_QUOTE_API_URL as string | undefined)?.replace(/\/$/, '') ?? '/api'
 
 function TokenButton({ token, onClick }: { token: Token; onClick: () => void }) {
   return <button className="token-button" onClick={onClick}><i style={{ background: token.color }}>{token.symbol.slice(0, 1)}</i><span>{token.symbol}</span><ChevronDown size={16} /></button>
@@ -48,8 +49,8 @@ export default function App() {
       try {
         const search = new URLSearchParams({ sellToken: sell.address, buyToken: buy.address, sellAmount: amountInUnits })
         if (address) search.set('taker', address)
-        const response = await fetch(`/api/quote?${search}`, { signal: controller.signal })
-        const data = await response.json()
+        const response = await fetch(`${quoteApi}/quote?${search}`, { signal: controller.signal })
+        const data = await response.json().catch(() => ({}))
         if (!response.ok) throw new Error(data.reason ?? '报价请求失败')
         setQuote(data)
       } catch (error) { if (!controller.signal.aborted) setQuoteError(error instanceof Error ? error.message : '报价请求失败') }

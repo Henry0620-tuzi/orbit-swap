@@ -5,6 +5,10 @@ import express from 'express'
 const app = express()
 const port = Number(process.env.PORT ?? 8787)
 const zeroExKey = process.env.ZEROX_API_KEY
+const allowedTokens = new Set([
+  '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+  '0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf', '0x50c5725949a6f0c72e6c4c89c4a4aa0f2bf1cd0d', '0xd9aaec86b65d86f6a7b5e56b9b3f6d4a0e09eac4',
+])
 
 app.use(cors())
 
@@ -19,7 +23,7 @@ app.get('/api/quote', async (req, res) => {
   }
 
   const { sellToken, buyToken, sellAmount, taker } = req.query
-  if (typeof sellToken !== 'string' || typeof buyToken !== 'string' || typeof sellAmount !== 'string' || !/^\d+$/.test(sellAmount)) {
+  if (typeof sellToken !== 'string' || typeof buyToken !== 'string' || typeof sellAmount !== 'string' || !/^\d{1,78}$/.test(sellAmount) || !allowedTokens.has(sellToken.toLowerCase()) || !allowedTokens.has(buyToken.toLowerCase()) || sellToken.toLowerCase() === buyToken.toLowerCase()) {
     res.status(400).json({ reason: '无效的报价参数。' })
     return
   }
