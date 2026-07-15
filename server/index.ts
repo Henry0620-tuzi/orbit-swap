@@ -22,13 +22,14 @@ app.get('/api/quote', async (req, res) => {
     return
   }
 
-  const { sellToken, buyToken, sellAmount, taker } = req.query
-  if (typeof sellToken !== 'string' || typeof buyToken !== 'string' || typeof sellAmount !== 'string' || !/^\d{1,78}$/.test(sellAmount) || !allowedTokens.has(sellToken.toLowerCase()) || !allowedTokens.has(buyToken.toLowerCase()) || sellToken.toLowerCase() === buyToken.toLowerCase()) {
+  const { sellToken, buyToken, sellAmount, taker, slippageBps } = req.query
+  const bps = typeof slippageBps === 'string' ? Number(slippageBps) : 50
+  if (typeof sellToken !== 'string' || typeof buyToken !== 'string' || typeof sellAmount !== 'string' || !/^\d{1,78}$/.test(sellAmount) || !Number.isInteger(bps) || bps < 1 || bps > 1000 || !allowedTokens.has(sellToken.toLowerCase()) || !allowedTokens.has(buyToken.toLowerCase()) || sellToken.toLowerCase() === buyToken.toLowerCase()) {
     res.status(400).json({ reason: '无效的报价参数。' })
     return
   }
 
-  const params = new URLSearchParams({ chainId: '8453', sellToken, buyToken, sellAmount })
+  const params = new URLSearchParams({ chainId: '8453', sellToken, buyToken, sellAmount, slippageBps: String(bps) })
   if (typeof taker === 'string' && /^0x[a-fA-F0-9]{40}$/.test(taker)) params.set('taker', taker)
 
   try {
