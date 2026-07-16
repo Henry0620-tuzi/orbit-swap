@@ -13,7 +13,7 @@ const allowedTokens = new Set([
 app.use(cors())
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, configured: Boolean(zeroExKey) })
+  res.json({ ok: true, configured: Boolean(zeroExKey), network: 'base', provider: '0x' })
 })
 
 app.get('/api/quote', async (req, res) => {

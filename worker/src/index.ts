@@ -27,6 +27,7 @@ export default {
     const headers = cors(request, env)
     if (request.method === 'OPTIONS') return new Response(null, { headers: { ...headers, 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '86400' } })
     const url = new URL(request.url)
+    if (request.method === 'GET' && url.pathname === '/health') return json({ ok: true, configured: Boolean(env.ZEROX_API_KEY), network: 'base', provider: '0x' }, 200, headers)
     if (request.method !== 'GET' || url.pathname !== '/quote') return json({ reason: 'Not found' }, 404, headers)
     if (!env.ZEROX_API_KEY) return json({ reason: '报价服务未配置。' }, 503, headers)
     const sellToken = url.searchParams.get('sellToken')?.toLowerCase()
